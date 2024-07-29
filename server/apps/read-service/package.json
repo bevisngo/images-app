@@ -1,0 +1,25 @@
+{
+  "name": "read-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@nestjs/common": "^10.3.10",
+    "@nestjs/core": "^10.3.10",
+    "@nestjs/microservices": "^10.3.10",
+    "@nestjs/platform-express": "^10.3.10",
+    "@nestjs/typeorm": "^10.0.2",
+    "mysql2": "^3.11.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.20"
+  }
+}
