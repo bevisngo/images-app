@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.client
+    volumes:
+      - ../client:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+
+  read-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.read-service
+    volumes:
+      - ../server/apps/read-service:/app
+      - /app/node_modules
+    ports:
+      - "3001:3000"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=password
+      - DB_DATABASE=image_app
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - S3_ENDPOINT=http://localstack:4566
+    depends_on:
+      - mysql
+      - rabbitmq
+      - localstack
+
+  write-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.write-service
+    volumes:
+      - ../server/apps/write-service:/app
+      - /app/node_modules
+    ports:
+      - "3002:3000"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=password
+      - DB_DATABASE=image_app
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - S3_ENDPOINT=http://localstack:4566
+    depends_on:
+      - mysql
+      - rabbitmq
+      - localstack
+
+  auth-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.auth-service
+    volumes:
+      - ../server/apps/auth-service:/app
+      - /app/node_modules
+    ports:
+      - "3003:3000"
+    environment:
+      - JWT_SECRET=your_jwt_secret
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      - rabbitmq
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: image_app
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"  # Main port for all LocalStack services
+      - "4572:4572"  # S3 port
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+    volumes:
+      - localstack_data:/tmp/localstack
+
+volumes:
+  db_data:
+  localstack_data:
