@@ -1,16 +1,14 @@
 import {
   IsNotEmpty,
   IsString,
-  IsStrongPassword,
-  Matches,
-  Validate,
+  IsStrongPassword
 } from 'class-validator';
 import { IsEqualTo } from './validators/is-equal-to.validator';
 
 export class LoginDto {
   @IsString()
   @IsNotEmpty()
-  username: string;
+  email: string;
 
   @IsString()
   @IsNotEmpty()
@@ -20,7 +18,7 @@ export class LoginDto {
 export class RegisterDto {
   @IsNotEmpty()
   @IsString()
-  username: string;
+  email: string;
 
   @IsNotEmpty()
   @IsStrongPassword()

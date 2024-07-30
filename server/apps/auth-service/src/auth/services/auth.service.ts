@@ -18,12 +18,12 @@ export class AuthService {
 
   /**
    * Attempts to log in a user with the provided credentials.
-   * @param loginDto - The login data containing the username and password.
+   * @param loginDto - The login data containing the email and password.
    * @returns The logged-in user object.
    */
   public async login(loginDto: LoginDto) {
     const user = await this.userRepository.findOne({
-      where: { username: loginDto.username },
+      where: { email: loginDto.email },
     });
 
     if (
@@ -48,22 +48,22 @@ export class AuthService {
 
   /**
    * Registers a new user in the system.
-   * @param registerDto - The registration data containing the username and password.
+   * @param registerDto - The registration data containing the email and password.
    * @returns The newly created user object.
    */
   public async register(registerDto: RegisterDto) {
     const existedUser = await this.userRepository.findOne({
-      where: { username: registerDto.username },
+      where: { email: registerDto.email },
     });
 
     if (existedUser) {
-      throw new HttpException('Username already taken', HttpStatus.CONFLICT);
+      throw new HttpException('email already existed', HttpStatus.CONFLICT);
     }
 
     const hashedPassword = await this.hashService.hash(registerDto.password);
 
     const createdUser = await this.userRepository.create({
-      username: registerDto.username,
+      email: registerDto.email,
       password: hashedPassword,
     });
 
@@ -80,7 +80,7 @@ export class AuthService {
 
   private _generateTokenPayload(user: User): JwtPayload {
     return {
-      username: user.username,
+      email: user.email,
       id: user.id,
     };
   }
