@@ -38,7 +38,7 @@ export class AuthService {
     delete user.password;
 
     const payload = this._generateTokenPayload(user);
-    const accessToken = await this._generateAccessToken(payload);
+    const accessToken = this.jwtService.sign(payload);
 
     return {
       user,
@@ -70,7 +70,7 @@ export class AuthService {
     delete createdUser.password;
 
     const payload = this._generateTokenPayload(createdUser);
-    const accessToken = await this._generateAccessToken(payload);
+    const accessToken = this.jwtService.sign(payload);
 
     return {
       user: createdUser,
@@ -83,12 +83,5 @@ export class AuthService {
       email: user.email,
       id: user.id,
     };
-  }
-
-  private async _generateAccessToken(payload: JwtPayload) {
-    return this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<number>('JWT_EXPIRE_IN') + 'd',
-    });
   }
 }

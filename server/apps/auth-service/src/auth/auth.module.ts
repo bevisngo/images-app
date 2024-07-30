@@ -8,18 +8,19 @@ import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
-    ConfigModule,
     PassportModule,
-    // JwtModule.registerAsync({
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: async (configService: ConfigService) => ({
-    //     secret: configService.get('JWT_SECRET'),
-
-    //   }),
-    // }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<number>('JWT_EXPIRE_IN') + 'd',
+        },
+      }),
+    }),
   ],
   controllers: [AuthController],
-  providers: [JwtService, AuthService, HashService],
+  providers: [AuthService, HashService],
 })
 export class AuthModule {}

@@ -9,7 +9,9 @@ import { AuthConfigModule } from './config/config.module';
     DatabaseModule,
     RepositoryModule,
     AuthConfigModule,
-    ConfigModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     AuthModule,
   ],
 })
