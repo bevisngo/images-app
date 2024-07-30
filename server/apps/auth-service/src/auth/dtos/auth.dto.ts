@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsStrongPassword,
+  Matches,
+  Validate,
+} from 'class-validator';
+import { IsEqualTo } from './validators/is-equal-to.validator';
 
 export class LoginDto {
   @IsString()
@@ -17,9 +24,10 @@ export class RegisterDto {
 
   @IsNotEmpty()
   @IsStrongPassword()
-  confirmPassword: string;
+  password: string;
 
   @IsNotEmpty()
   @IsStrongPassword()
-  password: string;
+  @IsEqualTo('password')
+  confirmPassword: string;
 }
