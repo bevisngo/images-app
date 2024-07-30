@@ -1,76 +1,73 @@
 version: "3.8"
 
 services:
-  # client:
-  #   build:
-  #     context: ..
-  #     dockerfile: docker/Dockerfile.client
-  #   volumes:
-  #     - ../client:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - NODE_ENV=development
+  client:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.client
+    volumes:
+      - ../client:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    command: npm run dev
+    env_file:
+      - ../client/.env
 
-  # read-service:
-  #   build:
-  #     context: ..
-  #     dockerfile: docker/Dockerfile.read-service
-  #   volumes:
-  #     - ../server/apps/read-service:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - "3001:3000"
-  #   environment:
-  #     - DB_HOST=mysql
-  #     - DB_PORT=3306
-  #     - DB_USERNAME=root
-  #     - DB_PASSWORD=password
-  #     - DB_DATABASE=image_app
-  #     - RABBITMQ_URL=amqp://rabbitmq:5672
-  #     - S3_ENDPOINT=http://localstack:4566
-  #   depends_on:
-  #     - mysql
-  #     - rabbitmq
-  #     - localstack
+  read-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.read-service
+    volumes:
+      - ../server:/app
+      - /app/node_modules
+      - /app/dist
+    ports:
+      - "3002:3002"
+    command: npm run start:dev read-service
+    env_file:
+      - ../server/.env
+    depends_on:
+      - mysql
+      # - rabbitmq
+      # - localstack
 
-  # write-service:
-  #   build:
-  #     context: ..
-  #     dockerfile: docker/Dockerfile.write-service
-  #   volumes:
-  #     - ../server/apps/write-service:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - "3002:3000"
-  #   environment:
-  #     - DB_HOST=mysql
-  #     - DB_PORT=3306
-  #     - DB_USERNAME=root
-  #     - DB_PASSWORD=password
-  #     - DB_DATABASE=image_app
-  #     - RABBITMQ_URL=amqp://rabbitmq:5672
-  #     - S3_ENDPOINT=http://localstack:4566
-  #   depends_on:
-  #     - mysql
-  #     - rabbitmq
-  #     - localstack
+  write-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.write-service
+    volumes:
+      - ../server:/app
+      - /app/node_modules
+      - /app/dist
+    ports:
+      - "3001:3001"
+    command: npm run start:dev write-service
+    env_file:
+      - ../server/.env
+    depends_on:
+      - mysql
+      # - rabbitmq
+      # - localstack
 
-  # auth-service:
-  #   build:
-  #     context: ..
-  #     dockerfile: docker/Dockerfile.auth-service
-  #   volumes:
-  #     - ../server/apps/auth-service:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - "3003:3000"
-  #   environment:
-  #     - JWT_SECRET=your_jwt_secret
-  #     - RABBITMQ_URL=amqp://rabbitmq:5672
-  #   depends_on:
-  #     - rabbitmq
+  auth-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.auth-service
+    volumes:
+      - ../server:/app
+      - /app/node_modules
+      - /app/dist
+    ports:
+      - "3003:3003"
+    command: npm run start:dev auth-service
+    env_file:
+      - ../server/.env
+    depends_on:
+      - mysql
+      # - rabbitmq
+      # - localstack
 
   mysql:
     image: mysql:8.0
@@ -85,16 +82,16 @@ services:
     ports:
       - "3306:3306"
 
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
+  # redis:
+  #   image: redis:alpine
+  #   ports:
+  #     - "6379:6379"
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   ports:
+  #     - "15672:15672"
+  #     - "5672:5672"
 
   # localstack:
   #   image: localstack/localstack
