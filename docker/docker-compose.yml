@@ -1,19 +1,19 @@
 version: "3.8"
 
 services:
-  client:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.client
-    volumes:
-      - ../client:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "3000:3000"
-    command: npm run dev
-    env_file:
-      - ../client/.env
+  # client:
+  #   build:
+  #     context: ..
+  #     dockerfile: docker/Dockerfile.client
+  #   volumes:
+  #     - ../client:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   ports:
+  #     - "3000:3000"
+  #   command: npm run dev
+  #   env_file:
+  #     - ../client/.env
 
   read-service:
     build:
