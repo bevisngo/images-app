@@ -1,18 +1,14 @@
-import { DatabaseModule, RepositoryModule } from '@app/common';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from './auth/auth.module';
-import { AuthConfigModule } from './config/config.module';
-
+import { PostModule } from './domains/post/post.module';
+import { AuthModule } from './domains/auth/auth.module';
 @Module({
   imports: [
-    DatabaseModule,
-    RepositoryModule,
-    AuthConfigModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     AuthModule,
+    PostModule,
   ],
 })
 export class AuthServiceModule {}

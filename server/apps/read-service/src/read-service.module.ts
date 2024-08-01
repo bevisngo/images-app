@@ -1,10 +1,34 @@
 import { Module } from '@nestjs/common';
-import { ReadServiceController } from './read-service.controller';
-import { ReadServiceService } from './read-service.service';
-
+import { ProfileModule } from './domains/profiles/profile.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { SERVICE } from '@app/common/constants';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as Joi from 'joi';
 @Module({
-  imports: [],
-  controllers: [ReadServiceController],
-  providers: [ReadServiceService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        // put your validation here
+      }),
+    }),
+    ClientsModule.registerAsync({
+      isGlobal: true,
+      clients: [
+        {
+          name: SERVICE.AUTH_SERVICE,
+          useFactory: (configService: ConfigService) => ({
+            transport: Transport.TCP,
+            options: {
+              host: configService.get('AUTH_SERVICE_HOST'),
+              port: configService.get('AUTH_SERVICE_TCP_PORT'),
+            },
+          }),
+          inject: [ConfigService],
+        },
+      ],
+    }),
+    ProfileModule,
+  ],
 })
 export class ReadServiceModule {}

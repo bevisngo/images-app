@@ -11,11 +11,19 @@ import {
   User,
 } from '../entities';
 import { UserRepository } from './user.repository';
-import { Profile } from '../entities/profiles.entity';
-import { Setting } from '../entities/settings.entity';
-import { Follow } from '../entities/follows.entity';
+import { Profile } from '../entities/profile.entity';
+import { Setting } from '../entities/setting.entity';
+import { Follow } from '../entities/follow.entity';
+import { ProfileRepository } from './profile.repository';
+import { SettingRepository } from './setting.repository';
+import { AvatarRepository } from './avatar.repository';
 
-const providers = [UserRepository];
+const providers = [
+  UserRepository,
+  ProfileRepository,
+  SettingRepository,
+  AvatarRepository,
+];
 
 @Global()
 @Module({
