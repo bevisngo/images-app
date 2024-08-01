@@ -8,6 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -15,6 +16,7 @@ export class JwtAuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
+    private authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -27,7 +29,10 @@ export class JwtAuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get('JWT_SECRET'),
       });
-      request['user'] = payload;
+
+      const user = await this.authService.validateUser(payload.id);
+      const { password, ...userResponse } = user;
+      request['user'] = userResponse;
     } catch {
       throw new UnauthorizedException();
     }
@@ -41,8 +46,6 @@ export class JwtAuthGuard implements CanActivate {
       request?.cookies?.authorization ||
       request?.authorization ||
       request?.headers?.authorization;
-
-    this._logger.debug(`Extracting token from ${tokenStr}`);
 
     const [type, token] = tokenStr?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;

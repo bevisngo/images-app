@@ -1,24 +1,22 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { Public } from './public.decorator';
-import { JwtAuthGuard } from './jwt-auth.guard';
+
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { AuthService } from '../services/auth.service';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { LoginDto, RegisterDto } from '../dtos/auth.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
   @Post('login')
-  async login(@Body() user: any) {
-    return this.authService.login(user);
+  public async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
 
-  @Public()
   @Post('register')
-  async register(@Body() user: any) {
-    // Implement register logic here
-    return { message: 'User registered successfully' };
+  public async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -26,4 +24,4 @@ export class AuthController {
   public async authenticate(@Payload() payload: any) {
     return payload.user;
   }
-} 
+}
