@@ -11,6 +11,6 @@ export class ProfileController {
 
   @Get()
   public async gerProfileDetail(@CurrentUser() user: User) {
-    return user;
+    return await this.profileService.getProfile(user);
   }
 }

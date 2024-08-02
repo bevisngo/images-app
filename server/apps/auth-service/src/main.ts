@@ -17,7 +17,7 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-
+  app.enableCors();
   await app.listen(configService.get('AUTH_SERVICE_HTTP_PORT'));
 }
 bootstrap();

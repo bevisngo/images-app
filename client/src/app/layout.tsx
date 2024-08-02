@@ -1,24 +1,19 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
+import { ReactNode } from "react";
 import "./globals.css";
-import NavigationBar from "@/layout/NavigationBar";
-import Modal from "@/components/widgets/Modal";
+type LoginLayoutProps = {
+  children: ReactNode;
+};
 
 export const metadata: Metadata = {
-  title: "Lona",
+  title: "Lonagram",
   description: "Created by Bevis Ngo",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function LoginLayout({ children }: LoginLayoutProps) {
   return (
     <html lang="en">
-      <body className="flex justify-end bg-[#000000] text-[#ffffff]">
-        <NavigationBar />
-        <div className="w-[calc(100%-200px)]">{children}</div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

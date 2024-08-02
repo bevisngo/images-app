@@ -4,6 +4,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SERVICE } from '@app/common/constants';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
+import { DatabaseModule, RepositoryModule } from '@app/common';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,6 +29,8 @@ import * as Joi from 'joi';
         },
       ],
     }),
+    DatabaseModule,
+    RepositoryModule,
     ProfileModule,
   ],
 })
