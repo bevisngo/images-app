@@ -1,4 +1,5 @@
 import axios from "axios";
+axios.defaults.withCredentials = true;
 
 export const AUTH_SERVICE_API = axios.create({
   baseURL: process.env.NEXT_PUBLIC_AUTH_SERVICE_API,

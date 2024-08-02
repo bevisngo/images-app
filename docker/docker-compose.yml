@@ -93,17 +93,57 @@ services:
   #     - "15672:15672"
   #     - "5672:5672"
 
-  # localstack:
-  #   image: localstack/localstack
-  #   ports:
-  #     - "4566:4566"  # Main port for all LocalStack services
-  #     - "4572:4572"  # S3 port
-  #   environment:
-  #     - SERVICES=s3
-  #     - DEBUG=1
-  #   volumes:
-  #     - localstack_data:/tmp/localstack
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566" # Gateway to all LocalStack services
+      - "4571:4571" # External service port
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/localstack/data
+      - AWS_DEFAULT_REGION=us-east-1
+      - CLEAR_TMP_FOLDER=0
+    volumes:
+      - "./localstack:/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
+  awscli:
+    image: amazon/aws-cli
+    container_name: awscli
+    depends_on:
+      - localstack
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ENDPOINT=http://localstack:4566
+    entrypoint: /bin/sh -c "while true; do sleep 1000; done"
+    volumes:
+      - ./config/aws/s3/config:/config
+    # minio:
+    #   image: minio/minio
+    #   container_name: minio
+    #   ports:
+    #     - "9000:9000"
+    #     - "9001:9001"
+    #   environment:
+    #     - MINIO_ROOT_USER=minioadmin
+    #     - MINIO_ROOT_PASSWORD=minioadmin
+    #   volumes:
+    #     - "minio-data:/data"
+    #   command: server /data --console-address ":9001"
+    # mc:
+    #   image: minio/mc
+    #   container_name: mc
+    #   depends_on:
+    #     - localstack
+    #   entrypoint: >
+    #     /bin/sh -c "while ! wget -q -T 1 -O - http://localstack:4566/_localstack/health | grep '\"s3\": \"running\"'; do sleep 1; done;
+    #     mc alias set localstack http://localstack:4566 test test &&
+    #     while true; do sleep 1000; done"
 volumes:
   db_data:
-  localstack_data:
+  localstack:
+  minio-data:

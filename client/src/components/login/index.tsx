@@ -26,7 +26,9 @@ export default function Login() {
     }
 
     AUTH_SERVICE_API.post("/auth/login", data).then((res) => {
-      setCookie("authorization", res.data.accessToken);
+      setCookie("authorization", "Bearer " + res.data.accessToken);
+      localStorage.setItem("accessToken", res.data.accessToken);
+      setCookie("demo", "testvalue");
       router.push("/");
     });
   };

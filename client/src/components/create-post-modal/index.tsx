@@ -1,6 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import feather from "feather-icons";
+import { WRITE_SERVICE_API } from "@/services/api/provider";
+import { getCookie } from "@/utils/client/ cookie";
+import { uploadFiles } from "@/services/api/external/s3";
 
 interface ModalProps {
   isVisible: boolean;
@@ -9,6 +12,8 @@ interface ModalProps {
 
 const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
   const [altTexts, setAltTexts] = useState<string[]>([]);
@@ -28,6 +33,7 @@ const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
+      setSelectedFiles(files);
       const images = files.map((file) => URL.createObjectURL(file));
       setSelectedImages(images);
       setCurrentImageIndex(0);
@@ -56,6 +62,16 @@ const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
     setAltTexts(newAltTexts);
   };
 
+  const handleShare = () => {
+    uploadFiles(selectedFiles)
+      .then(() => {
+        console.log("upload successfully");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -69,7 +85,10 @@ const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
             Create new post
           </h2>
           {selectedImages.length > 0 && (
-            <button className="text-[#2e86de] px-4 rounded absolute right-[10px] top-0 font-bold">
+            <button
+              className="text-[#2e86de] px-4 rounded absolute right-[10px] top-0 font-bold"
+              onClick={handleShare}
+            >
               Share
             </button>
           )}

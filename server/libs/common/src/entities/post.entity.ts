@@ -24,6 +24,9 @@ export class Post extends BaseEntity {
   @Column({ default: 0 })
   comments: number;
 
+  @Column({ default: 0 })
+  likes: number;
+
   @OneToMany(() => Image, (image) => image.post)
   images: Image[];
 
@@ -31,7 +34,7 @@ export class Post extends BaseEntity {
   postComments: Comment[];
 
   @OneToMany(() => Like, (like) => like.post)
-  likes: Like[];
+  postLikes: Like[];
 
   @OneToMany(
     () => PostCollaborator,

@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AuthServiceModule } from './auth-service.module';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthServiceModule);
@@ -17,7 +18,13 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  app.enableCors();
+
+  app.use(cookieParser());
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true, 
+  });
+
   await app.listen(configService.get('AUTH_SERVICE_HTTP_PORT'));
 }
 bootstrap();
