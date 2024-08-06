@@ -1,7 +1,20 @@
+import { User } from '@app/common/entities';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
+
+interface GetPresignedUrl {
+  filename: string;
+  mimeType: string;
+}
+
+interface GetPresignedUrlResponse {
+  filename: string;
+  mimeType: string;
+  path: string;
+  url: string;
+}
 
 @Injectable()
 export class S3Service {
@@ -29,7 +42,7 @@ export class S3Service {
   async uploadFile(file: Express.Multer.File): Promise<void> {
     const params = {
       Bucket: this.postImagesBucketName,
-      Key: `${uuidv4()}-${file.originalname}`, // Tạo tên file duy nhất bằng UUID
+      Key: `${uuidv4()}-${file.originalname}`,
       Body: file.buffer,
     };
     await this.s3.upload(params).promise();
@@ -43,27 +56,35 @@ export class S3Service {
       Bucket: this.postImagesBucketName,
     };
     const data = await this.s3.listObjectsV2(params).promise();
-    console.log(
-      `Objects in bucket "${this.postImagesBucketName}":`,
-      data.Contents,
-    );
+
     return data.Contents;
   }
 
   async getPresignedUrls(
-    files: { name: string; mimeType: string }[],
-  ): Promise<string[]> {
+    files: GetPresignedUrl[],
+    user: User,
+    type: string,
+  ): Promise<GetPresignedUrlResponse[]> {
     const urls = await Promise.all(
       files.map(async (file) => {
-        const uniqueFileName = `${uuidv4()}-${file.name}`;
+        const groupResolution =
+          uuidv4() + file.filename.split(file.mimeType)[0];
+
+        const path =
+          user.id + '/' + type + '/' + groupResolution + '/' + file.filename;
         const params = {
           Bucket: this.postImagesBucketName,
-          Key: uniqueFileName,
+          Key: path,
           Expires: 60,
           ContentType: file.mimeType,
         };
         const url = await this.s3.getSignedUrlPromise('putObject', params);
-        return url;
+        return {
+          filename: file.filename,
+          mimeType: file.mimeType,
+          path,
+          url,
+        };
       }),
     );
     return urls;

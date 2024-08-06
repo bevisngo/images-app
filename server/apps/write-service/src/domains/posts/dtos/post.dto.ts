@@ -1,14 +1,36 @@
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Validate,
+} from 'class-validator';
 
 export class MediaType {
   @IsString()
+  @IsNotEmpty()
   mimetype: string;
 
   @IsString()
-  filenames: string;
+  @IsNotEmpty()
+  filename: string;
 
   @IsString()
+  @IsNotEmpty()
   path: string;
+
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+
+  @IsString()
+  @IsOptional()
+  alt: string;
+
+  // @IsArray()
+  // @IsOptional()
+  // hashtags: string[];
 }
 
 export class CreatePostDto {
@@ -17,5 +39,7 @@ export class CreatePostDto {
 
   @IsNotEmpty()
   @IsArray()
-  images: string[];
+  @Validate(IsArray({ each: true }))
+  @Type(() => MediaType)
+  images: MediaType[];
 }

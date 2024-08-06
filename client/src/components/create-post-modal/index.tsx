@@ -1,9 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import feather from "feather-icons";
 import { WRITE_SERVICE_API } from "@/services/api/provider";
 import { getCookie } from "@/utils/client/ cookie";
 import { uploadFiles } from "@/services/api/external/s3";
+import { createPostAPI } from "@/services/api/internal/post.api";
 
 interface ModalProps {
   isVisible: boolean;
@@ -13,7 +14,7 @@ interface ModalProps {
 const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-
+  const captionRef = useRef<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
   const [altTexts, setAltTexts] = useState<string[]>([]);
@@ -29,6 +30,10 @@ const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
       onClose();
     }
   };
+
+  useEffect(() => {
+    clear();
+  }, [isVisible]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -63,13 +68,39 @@ const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
   };
 
   const handleShare = () => {
+    const caption = captionRef.current.trim();
+    if (!caption) return;
+
     uploadFiles(selectedFiles)
-      .then(() => {
-        console.log("upload successfully");
+      .then((images) => {
+        if (images && images.length > 0) {
+          console.log("upload successfully", images);
+          const createPostPayload = {
+            caption,
+            images: images.map((img) => ({
+              filename: img.filename,
+              path: img.path,
+              url: img.url,
+            })),
+          };
+
+          createPostAPI(createPostPayload).then((res) => {
+            console.log("created successfully", res);
+            clear();
+            onClose();
+          });
+        }
       })
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const clear = () => {
+    setCurrentImageIndex(0);
+    setIsAccessibilityOpen(false);
+    setSelectedFiles([]);
+    setSelectedImages([]);
   };
 
   if (!isVisible) return null;
@@ -156,6 +187,7 @@ const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
                   className="w-full p-2 mb-4 bg-transparent text-white rounded resize-none outline-none"
                   placeholder="Write a caption..."
                   rows={6}
+                  onChange={(e) => (captionRef.current = e.target.value)}
                 />
                 <div className="flex flex-col space-y-2">
                   <button className="bg-transparent text-white py-2 px-4 rounded flex justify-between items-center">

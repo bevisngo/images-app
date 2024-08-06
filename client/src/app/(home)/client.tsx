@@ -1,3 +1,7 @@
+import ListPost from "@/components/list-post";
+import Suggestions from "@/components/suggestions";
+
 export default function HomeClient() {
-  return <h1>Lona app</h1>;
+  // return <Suggestions />;
+  return <ListPost />;
 }

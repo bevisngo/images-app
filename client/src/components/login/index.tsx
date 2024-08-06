@@ -2,6 +2,7 @@
 
 import { AUTH_SERVICE_API } from "@/services/api/provider";
 import { setCookie } from "@/utils/client/ cookie";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
@@ -27,8 +28,6 @@ export default function Login() {
 
     AUTH_SERVICE_API.post("/auth/login", data).then((res) => {
       setCookie("authorization", "Bearer " + res.data.accessToken);
-      localStorage.setItem("accessToken", res.data.accessToken);
-      setCookie("demo", "testvalue");
       router.push("/");
     });
   };
@@ -100,9 +99,12 @@ export default function Login() {
         <div className="text-center">
           <p className="text-sm">
             Don't have an account?{" "}
-            <a href="#" className="font-medium text-blue-500 hover:underline">
+            <Link
+              href="/accounts/signup"
+              className="font-medium text-blue-500 hover:underline"
+            >
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>

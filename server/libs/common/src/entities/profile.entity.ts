@@ -23,9 +23,6 @@ export class Profile extends BaseEntity {
   posts: number;
 
   @Column({ nullable: true })
-  avatar: string;
-
-  @Column({ nullable: true })
   name: string;
 
   @Column({

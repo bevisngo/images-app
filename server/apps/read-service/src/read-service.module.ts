@@ -5,13 +5,12 @@ import { SERVICE } from '@app/common/constants';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { DatabaseModule, RepositoryModule } from '@app/common';
+import PostsModule from './domains/posts/post.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validationSchema: Joi.object({
-        // put your validation here
-      }),
+      validationSchema: Joi.object({}),
     }),
     ClientsModule.registerAsync({
       isGlobal: true,
@@ -32,6 +31,7 @@ import { DatabaseModule, RepositoryModule } from '@app/common';
     DatabaseModule,
     RepositoryModule,
     ProfileModule,
+    PostsModule,
   ],
 })
 export class ReadServiceModule {}

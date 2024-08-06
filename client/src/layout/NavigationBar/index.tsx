@@ -1,6 +1,7 @@
 "use client";
 
 import CreatePostModal from "@/components/create-post-modal";
+import { DEFAULT_PROFILE } from "@/constant/profile.constant";
 import feather from "feather-icons";
 import Image from "next/image";
 import Link from "next/link";
@@ -76,7 +77,7 @@ const NavigationBar: React.FC = () => {
             className="flex items-center space-x-3 hover:bg-gray-800 p-2 rounded"
           >
             <img
-              src="/avatars/bevis.png"
+              src={DEFAULT_PROFILE.avatar}
               alt="Profile"
               className="rounded-full w-6 h-6 object-cover"
             />

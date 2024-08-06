@@ -10,7 +10,7 @@ import {
 export class SinglePresignedUrlDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  filename: string;
 
   @IsString()
   @IsNotEmpty()
@@ -23,4 +23,8 @@ export class GetPresignedUrlDto {
   @ValidateNested({ each: true })
   @Type(() => SinglePresignedUrlDto)
   files: SinglePresignedUrlDto[];
+
+  @IsString()
+  @IsNotEmpty()
+  type: string; // 'post' | 'profile'
 }

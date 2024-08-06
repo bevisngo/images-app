@@ -1,20 +1,23 @@
-import {
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { Image } from './image.entity';
 import { Profile } from './profile.entity';
 
 @Entity('avatars')
 export class Avatar extends BaseEntity {
-  @OneToOne(() => Profile, (profile) => profile.avatar)
+  @ManyToOne(() => Profile, (profile) => profile.avatars)
   @JoinColumn({ name: 'profile_id' })
   profile: Profile;
 
-  @ManyToOne(() => Image, (image) => image.id)
-  @JoinColumn({ name: 'image_id' })
-  image: Image;
+  @Column()
+  url: string;
+
+  @Column()
+  path: string;
+
+  @Column()
+  filename: string;
+
+  @Column({ default: true })
+  isUsing: boolean;
 }

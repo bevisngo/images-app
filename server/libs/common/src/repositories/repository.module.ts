@@ -17,12 +17,16 @@ import { Follow } from '../entities/follow.entity';
 import { ProfileRepository } from './profile.repository';
 import { SettingRepository } from './setting.repository';
 import { AvatarRepository } from './avatar.repository';
+import { PostRepository } from './post.repository';
+import { ImageRepository } from './image.repository';
 
 const providers = [
   UserRepository,
   ProfileRepository,
   SettingRepository,
   AvatarRepository,
+  PostRepository,
+  ImageRepository,
 ];
 
 @Global()

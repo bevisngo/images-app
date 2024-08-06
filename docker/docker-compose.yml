@@ -81,18 +81,6 @@ services:
       - ./mysql-data:/var/lib/mysql
     ports:
       - "3306:3306"
-
-  # redis:
-  #   image: redis:alpine
-  #   ports:
-  #     - "6379:6379"
-
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   ports:
-  #     - "15672:15672"
-  #     - "5672:5672"
-
   localstack:
     image: localstack/localstack:latest
     container_name: localstack
@@ -102,11 +90,14 @@ services:
     environment:
       - SERVICES=s3
       - DEBUG=1
-      - DATA_DIR=/localstack/data
+      - PERSISTENCE=1
       - AWS_DEFAULT_REGION=us-east-1
       - CLEAR_TMP_FOLDER=0
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - S3_DIR=/tmp/s3-mounts
     volumes:
-      - "./localstack:/localstack"
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "./mounts:/tmp/s3-mounts"
       - "/var/run/docker.sock:/var/run/docker.sock"
 
   awscli:
@@ -122,28 +113,7 @@ services:
     entrypoint: /bin/sh -c "while true; do sleep 1000; done"
     volumes:
       - ./config/aws/s3/config:/config
-    # minio:
-    #   image: minio/minio
-    #   container_name: minio
-    #   ports:
-    #     - "9000:9000"
-    #     - "9001:9001"
-    #   environment:
-    #     - MINIO_ROOT_USER=minioadmin
-    #     - MINIO_ROOT_PASSWORD=minioadmin
-    #   volumes:
-    #     - "minio-data:/data"
-    #   command: server /data --console-address ":9001"
-    # mc:
-    #   image: minio/mc
-    #   container_name: mc
-    #   depends_on:
-    #     - localstack
-    #   entrypoint: >
-    #     /bin/sh -c "while ! wget -q -T 1 -O - http://localstack:4566/_localstack/health | grep '\"s3\": \"running\"'; do sleep 1; done;
-    #     mc alias set localstack http://localstack:4566 test test &&
-    #     while true; do sleep 1000; done"
+
 volumes:
-  db_data:
-  localstack:
-  minio-data:
+  localstack_data:
+  mysql-data:

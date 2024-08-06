@@ -14,7 +14,7 @@ export class Image extends BaseEntity {
   @JoinColumn({ name: 'post_id' })
   post: Post;
 
-  @Column()
+  @Column({ type: 'text'})
   url: string;
 
   @Column()

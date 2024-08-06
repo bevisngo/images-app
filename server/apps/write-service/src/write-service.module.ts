@@ -5,6 +5,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UploadModule } from './domains/upload/upload.module';
 import { S3Module } from '@app/common/aws';
+import { PostModule } from './domains/posts/post.module';
+import { ProfileModule } from './domains/profile/profile.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { S3Module } from '@app/common/aws';
     }),
 
     UploadModule,
+    PostModule,
+    ProfileModule,
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,4 @@
-import { UserRepository } from '@app/common';
+import { ProfileRepository, UserRepository } from '@app/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto, RegisterDto } from '../dtos/auth.dto';
@@ -12,6 +12,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userRepository: UserRepository,
+    private readonly profileRepository: ProfileRepository,
     private readonly hashService: HashService,
     private readonly configService: ConfigService,
   ) {}
@@ -53,11 +54,19 @@ export class AuthService {
    */
   public async register(registerDto: RegisterDto) {
     const existedUser = await this.userRepository.findOne({
-      where: { email: registerDto.email },
+      where: [{ email: registerDto.email }],
     });
 
     if (existedUser) {
       throw new HttpException('email already existed', HttpStatus.CONFLICT);
+    }
+
+    const existedUsername = await this.profileRepository.findOne({
+      where: { username: registerDto.username },
+    });
+
+    if (existedUsername) {
+      throw new HttpException('username was taken.', HttpStatus.CONFLICT);
     }
 
     const hashedPassword = await this.hashService.hash(registerDto.password);
@@ -67,6 +76,17 @@ export class AuthService {
       password: hashedPassword,
     });
 
+    const profile = await this.profileRepository.create({
+      user: createdUser,
+      name: registerDto.fullname,
+      username: registerDto.username,
+      avatar: '',
+      bio: '',
+      followers: 0,
+      following: 0,
+      posts: 0,
+    });
+
     delete createdUser.password;
 
     const payload = this._generateTokenPayload(createdUser);
@@ -74,6 +94,7 @@ export class AuthService {
 
     return {
       user: createdUser,
+      profile: profile,
       accessToken,
     };
   }
