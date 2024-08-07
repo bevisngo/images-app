@@ -30,7 +30,6 @@ const Signup: React.FC = () => {
         password,
         confirmPassword,
       }).then((res) => {
-        console.log(res);
         setCookie("authorization", "Bearer " + res.accessToken);
         router.push("/");
       });

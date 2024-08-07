@@ -1,11 +1,14 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from "react";
 
 interface InfiniteScrollProps {
   loadMore: () => void;
   hasMore: boolean;
 }
 
-const InfiniteScroll: React.FC<InfiniteScrollProps> = ({ loadMore, hasMore }) => {
+const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
+  loadMore,
+  hasMore,
+}) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useCallback(
     (node: any) => {
@@ -20,9 +23,7 @@ const InfiniteScroll: React.FC<InfiniteScrollProps> = ({ loadMore, hasMore }) =>
     [loadMore, hasMore]
   );
 
-  console.log(`Loading ....`, hasMore)
-
-  return <div ref={lastElementRef} className='h-[2px] w-[100px] bg-white' />;
+  return <div ref={lastElementRef} className="h-[2px] w-[100px] bg-white" />;
 };
 
 export default InfiniteScroll;

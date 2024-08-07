@@ -36,7 +36,6 @@ export class S3Service {
       Bucket: bucketName,
     };
     await this.s3.createBucket(params).promise();
-    console.log(`Bucket "${bucketName}" created successfully.`);
   }
 
   async uploadFile(file: Express.Multer.File): Promise<void> {
@@ -46,9 +45,6 @@ export class S3Service {
       Body: file.buffer,
     };
     await this.s3.upload(params).promise();
-    console.log(
-      `File "${file.originalname}" uploaded successfully to bucket "${this.postImagesBucketName}".`,
-    );
   }
 
   async listObjects(): Promise<AWS.S3.ObjectList> {
@@ -59,34 +55,55 @@ export class S3Service {
 
     return data.Contents;
   }
+  async getFile(path: string): Promise<AWS.S3.GetObjectOutput> {
+    const params = {
+      Bucket: this.postImagesBucketName,
+      Key: path,
+    };
+    const data = await this.s3.getObject(params).promise();
+    return data;
+  }
 
-  async getPresignedUrls(
-    files: GetPresignedUrl[],
-    user: User,
-    type: string,
-  ): Promise<GetPresignedUrlResponse[]> {
-    const urls = await Promise.all(
-      files.map(async (file) => {
-        const groupResolution =
-          uuidv4() + file.filename.split(file.mimeType)[0];
-
-        const path =
-          user.id + '/' + type + '/' + groupResolution + '/' + file.filename;
+  async getFiles(paths: string[]): Promise<AWS.S3.GetObjectOutput[]> {
+    const files = await Promise.all(
+      paths.map(async (path) => {
         const params = {
           Bucket: this.postImagesBucketName,
           Key: path,
-          Expires: 60,
-          ContentType: file.mimeType,
         };
-        const url = await this.s3.getSignedUrlPromise('putObject', params);
-        return {
-          filename: file.filename,
-          mimeType: file.mimeType,
-          path,
-          url,
-        };
+        return await this.s3.getObject(params).promise();
       }),
     );
-    return urls;
+    return files;
+  }
+
+  async uploadFiles(
+    files: { path: string; buffer: Buffer; contentType: string }[],
+  ): Promise<void> {
+    await Promise.all(
+      files.map(async (file) => {
+        const params = {
+          Bucket: this.postImagesBucketName,
+          Key: file.path,
+          Body: file.buffer,
+          ContentType: file.contentType,
+        };
+        await this.s3.upload(params).promise();
+      }),
+    );
+  }
+
+  async uploadResizedImage(
+    path: string,
+    buffer: Buffer,
+    contentType: string,
+  ): Promise<void> {
+    const params = {
+      Bucket: this.postImagesBucketName,
+      Key: path,
+      Body: buffer,
+      ContentType: contentType,
+    };
+    await this.s3.upload(params).promise();
   }
 }

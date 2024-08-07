@@ -74,7 +74,6 @@ const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
     uploadFiles(selectedFiles)
       .then((images) => {
         if (images && images.length > 0) {
-          console.log("upload successfully", images);
           const createPostPayload = {
             caption,
             images: images.map((img) => ({
@@ -85,7 +84,6 @@ const CreatePostModal: React.FC<ModalProps> = ({ isVisible, onClose }) => {
           };
 
           createPostAPI(createPostPayload).then((res) => {
-            console.log("created successfully", res);
             clear();
             onClose();
           });

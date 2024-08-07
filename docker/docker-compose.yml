@@ -68,7 +68,34 @@ services:
       - mysql
       # - rabbitmq
       # - localstack
-
+  consumer:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.consumer
+    volumes:
+      - ../server:/app
+      - /app/node_modules
+      - /app/dist
+    ports:
+      - "3004:3004"
+    command: npm run start:dev consumer
+    env_file:
+      - ../server/.env
+    depends_on:
+      - mysql
+      - redis
+      # - rabbitmq
+      # - localstack
+  # rabbitmq:
+  #   image: "rabbitmq:3-management"
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
   mysql:
     image: mysql:8.0
     container_name: docker-mysql-1
@@ -99,7 +126,6 @@ services:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "./mounts:/tmp/s3-mounts"
       - "/var/run/docker.sock:/var/run/docker.sock"
-
   awscli:
     image: amazon/aws-cli
     container_name: awscli

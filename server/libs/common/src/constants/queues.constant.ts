@@ -1,0 +1,3 @@
+export const IMAGE_QUEUE = 'IMAGE';
+
+export const IMAGE_RESOLUTION_JOB = 'IMAGE_RESOLUTION_JOB';

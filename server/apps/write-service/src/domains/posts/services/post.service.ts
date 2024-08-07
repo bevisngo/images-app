@@ -3,12 +3,19 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from '../dtos/post.dto';
 import { PostRepository } from '@app/common/repositories/post.repository';
 import { ImageRepository } from '@app/common/repositories/image.repository';
+import { Queue } from 'bullmq';
+import {
+  IMAGE_QUEUE,
+  IMAGE_RESOLUTION_JOB,
+} from '@app/common/constants/queues.constant';
+import { InjectQueue } from '@nestjs/bullmq';
 
 @Injectable()
 export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
     private readonly imageRepository: ImageRepository,
+    @InjectQueue(IMAGE_QUEUE) private imageQueue: Queue,
   ) {}
 
   public async createPost(user: User, createPostDto: CreatePostDto) {
@@ -26,7 +33,10 @@ export class PostService {
       };
     });
 
-    await this.imageRepository.createMany(imagesPayload);
+    const images = await this.imageRepository.createMany(imagesPayload);
+
+    await this.imageQueue.add(IMAGE_RESOLUTION_JOB, images);
+
     return post;
   }
 }

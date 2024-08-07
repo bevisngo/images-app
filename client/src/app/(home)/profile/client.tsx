@@ -44,7 +44,6 @@ const Profile: React.FC = () => {
 
   const fetchProfile = () => {
     getProfileAPI().then((prof) => {
-      console.log(prof);
       setProfile(prof);
     });
   };
@@ -91,7 +90,6 @@ const Profile: React.FC = () => {
           };
 
           updateAvatarAPI(avatar).then((res) => {
-            console.log("created successfully", res);
             setIsShowModalConfirmUpdateAvatar(false);
             fetchProfile();
           });

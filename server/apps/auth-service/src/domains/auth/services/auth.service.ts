@@ -80,7 +80,6 @@ export class AuthService {
       user: createdUser,
       name: registerDto.fullname,
       username: registerDto.username,
-      avatar: '',
       bio: '',
       followers: 0,
       following: 0,
